@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
     bool humanPlayerOne = false;
-    bool humanPlayerTwo = false;
+    bool humanPlayerTwo = true;
     array<array<int, 7>, 6> board = {};
     int player = 1;
     int col;

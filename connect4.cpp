@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int maxDepth = 10;
+int maxDepth = 8;
 
 vector<int> getMoves(array<array<int, 7>, 6> board)
 {
