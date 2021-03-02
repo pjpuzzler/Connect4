@@ -1,111 +1,248 @@
 #include <iostream>
+#include <algorithm>
+#include <vector>
+#include <array>
 
 using namespace std;
 
-bool gameOver(int board[7][7], int col)
+vector<int> getMoves(array<array<int, 7>, 6> board)
 {
-    int row = 5;
+    vector<int> moves;
+
+    if (board[0][3] == 0)
+        moves.push_back(3);
+    if (board[0][2] == 0)
+        moves.push_back(2);
+    if (board[0][4] == 0)
+        moves.push_back(4);
+    if (board[0][1] == 0)
+        moves.push_back(1);
+    if (board[0][5] == 0)
+        moves.push_back(5);
+    if (board[0][0] == 0)
+        moves.push_back(0);
+    if (board[0][6] == 0)
+        moves.push_back(6);
+
+    return moves;
+}
+
+int evaluate(array<array<int, 7>, 6> board)
+{
+    int res = gameOver(board);
+
+    if (res == 1)
+        return 99;
+    if (res == 2)
+        return -99;
+    if (res == 3)
+        return 0;
+
+    int eval = 0;
     int i = 0;
-    int count = 0;
+    int player = 1;
+
+    // check partial connects
+}
+
+int negamax(array<array<int, 7>, 6> board, int depth, int alpha, int beta, int coef)
+{
+    if (depth == 0 || gameOver(board) > 0)
+        return coef * evaluate(board);
+
+    int maxEval = -100;
+    int player;
+    int bestMove;
+    for (int move : getMoves(board))
+    {
+        if (coef == 1)
+            player = 1;
+        else
+            player = 2;
+
+        int eval = -negamax(pushMove(board, move, player), depth - 1, -beta, -alpha, -coef);
+
+        if (eval > maxEval)
+        {
+            maxEval = eval;
+            bestMove = move;
+        }
+
+        alpha = max(alpha, maxEval);
+        if (alpha >= beta)
+            break;
+    }
+
+    if (depth == 0)
+        return bestMove;
+    else
+        return maxEval;
+}
+
+int gameOver(array<array<int, 7>, 6> board)
+{
+    if (board[0][0] != 0 && board[0][1] != 0 && board[0][2] != 0 && board[0][3] != 0 && board[0][4] != 0 && board[0][5] != 0 && board[0][6] != 0)
+        return 3;
+
+    int i = 0;
+    int j;
+    int count;
     int player;
     int diagRow;
     int diagCol;
 
-    while (row >= 0 && board[row][col] != 0)
-        row--;
-
-    row++;
-
-    player = board[row][col];
-
     // horizontal check
-    for (i; i < 7; i++)
+    for (i; i < 6; i++)
     {
-        if (board[row][i] == player)
-            count++;
-        else
-            count = 0;
+        count = 0;
+        player = 0;
 
-        if (count == 4)
-            return true;
+        for (j = 0; j < 7; j++)
+        {
+            if (board[i][j] == 0)
+                count = 0;
+            else if (board[i][j] != player)
+            {
+                count = 0;
+                player = board[i][j];
+            }
+            else
+                count++;
+
+            if (count == 4)
+                return player;
+        }
     }
 
     // vertical check
-    count = 0;
-
     for (i = 0; i < 7; i++)
     {
-        if (board[i][col] == player)
-            count++;
-        else
-            count = 0;
+        count = 0;
+        player = 0;
 
-        if (count == 4)
-            return true;
+        for (j = 5; j >= 0; j--)
+        {
+            if (board[j][i] == 0)
+                count = 0;
+            else if (board[j][i] != player)
+            {
+                count = 0;
+                player = board[j][i];
+            }
+            else
+                count++;
+
+            if (count == 4)
+                return player;
+        }
     }
 
     // top-left to bottom-right diagonal check
-    count = 0;
-
-    if (row < 4)
+    for (i = 0; i < 3; i++)
     {
-        diagRow = 0;
-    }
-    else
-        diagRow = row - 3;
+        j = 0;
+        count = 0;
+        player = 0;
 
-    if (col < 4)
-        diagCol = 0;
-    else
-        diagCol = col - 3;
-
-    if (diagRow < 4 && diagCol < 4)
-    {
-        for (i = 0; i < 7; i++, diagRow++, diagCol++)
+        while (i + j < 6)
         {
-            if (board[diagRow][diagCol] == player)
-                count++;
-            else
+            if (board[i + j][j] == 0)
                 count = 0;
+            else if (board[i + j][j] != player)
+            {
+                count = 0;
+                player = board[i + j][j];
+            }
+            else
+                count++;
 
             if (count == 4)
-                return true;
+                return player;
+
+            j++;
+        }
+    }
+
+    for (i = 1; i < 4; i++)
+    {
+        j = 0;
+        count = 0;
+        player = 0;
+
+        while (i + j < 7)
+        {
+            if (board[j][i + j] == 0)
+                count = 0;
+            else if (board[j][i + j] != player)
+            {
+                count = 0;
+                player = board[j][i + j];
+            }
+            else
+                count++;
+
+            if (count == 4)
+                return player;
+
+            j++;
         }
     }
 
     // bottom-left to top-right diagonal check
-    count = 0;
-
-    if (row > 2)
+    for (i = 3; i < 6; i++)
     {
-        diagRow = 6;
-    }
-    else
-        diagRow = row + 3;
+        j = 0;
+        count = 0;
+        player = 0;
 
-    if (col < 4)
-        diagCol = 0;
-    else
-        diagCol = col - 3;
-
-    if (diagRow > 2 && diagCol < 4)
-    {
-        for (i = 0; i < 7; i++, diagRow--, diagCol++)
+        while (i - j >= 0)
         {
-            if (board[diagRow][diagCol] == player)
-                count++;
-            else
+            if (board[i - j][j] == 0)
                 count = 0;
+            else if (board[i - j][j] != player)
+            {
+                count = 0;
+                player = board[i - j][j];
+            }
+            else
+                count++;
 
             if (count == 4)
-                return true;
+                return player;
+
+            j++;
         }
     }
 
-    return false;
+    for (i = 1; i < 4; i++)
+    {
+        j = 6;
+        count = 0;
+        player = 0;
+
+        while (i + 6 - j < 7)
+        {
+            if (board[j][i + 6 - j] == 0)
+                count = 0;
+            else if (board[j][i + 6 - j] != player)
+            {
+                count = 0;
+                player = board[j][i + 6 - j];
+            }
+            else
+                count++;
+
+            if (count == 4)
+                return player;
+
+            j--;
+        }
+    }
+
+    return 0;
 }
 
-void displayBoard(int board[7][7])
+void displayBoard(array<array<int, 7>, 6> board)
 {
     system("CLS");
 
@@ -120,12 +257,12 @@ void displayBoard(int board[7][7])
     }
 }
 
-bool validMove(int board[7][7], int col)
+bool validMove(array<array<int, 7>, 6> board, int col)
 {
     return col >= 0 && col < 7 && board[0][col] == 0;
 }
 
-void move(int board[7][7], int col, int player)
+array<array<int, 7>, 6> pushMove(array<array<int, 7>, 6> board, int col, int player)
 {
     int row = 6;
 
@@ -133,14 +270,17 @@ void move(int board[7][7], int col, int player)
         row--;
 
     board[row][col] = player;
+
+    return board;
 }
 
 int main(int argc, char *argv[])
 {
     bool humanPlayerOne = true;
     bool humanPlayerTwo = true;
-    int board[7][7] = {};
+    array<array<int, 7>, 6> board = {};
     int player = 1;
+    int depth = 5;
     int col;
 
     do
@@ -148,7 +288,16 @@ int main(int argc, char *argv[])
         if (player == 1 && !humanPlayerOne || player == 2 && !humanPlayerTwo)
         {
             // AI turn
+            int coef;
+
             displayBoard(board);
+
+            if (player == 1)
+                coef = 1;
+            else
+                coef = -1;
+
+            board = pushMove(board, negamax(board, depth, -100, 100, coef), player);
         }
         else
         {
@@ -169,7 +318,7 @@ int main(int argc, char *argv[])
 
                 if (validMove(board, col))
                 {
-                    move(board, col, player);
+                    board = pushMove(board, col, player);
                     break;
                 }
                 // }
@@ -185,14 +334,18 @@ int main(int argc, char *argv[])
             player = 2;
         else
             player = 1;
-    } while (!gameOver(board, col));
+    } while (gameOver(board) == 0);
+
+    int res = gameOver(board);
 
     displayBoard(board);
 
-    if (player == 2)
-        cout << "\nPlayer 1 Wins!";
-    else
+    if (res == 3)
+        cout << "\nDraw!";
+    else if (res == 2)
         cout << "\nPlayer 2 Wins!";
+    else
+        cout << "\nPlayer 1 Wins!";
 
     return 0;
 }
