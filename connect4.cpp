@@ -600,15 +600,29 @@ void displayBoard(array<array<int, 7>, 6> board)
 {
     system("CLS");
 
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 24; i++)
     {
         for (int j = 0; j < 7; j++)
         {
-            cout << board[i][j] << "  ";
+            if (i % 4 == 0)
+                cout << "|-----";
+            else if ((i - 2) % 4 == 0)
+            {
+                if (board[floor(i / 4)][j] == 1)
+                    cout << "|  X  ";
+                else if (board[floor(i / 4)][j] == 2)
+                    cout << "|  O  ";
+                else
+                    cout << "|     ";
+            }
+            else
+                cout << "|     ";
         }
 
-        cout << "\n";
+        cout << "|\n";
     }
+
+    cout << "------------------------------------------";
 }
 
 bool validMove(array<array<int, 7>, 6> board, int col)

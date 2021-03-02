@@ -27,14 +27,12 @@ int main(int argc, char *argv[])
             // player turn
             while (true)
             {
-                // try
-                // {
                 displayBoard(board);
 
                 if (player == 1)
-                    cout << "\n(Player 1) Column: ";
+                    cout << "\n(X) Column: ";
                 else
-                    cout << "\n(Player 2) Column: ";
+                    cout << "\n(O) Column: ";
 
                 cin >> col;
                 col--;
@@ -44,11 +42,6 @@ int main(int argc, char *argv[])
                     board = pushMove(board, col, player);
                     break;
                 }
-                // }
-                // catch ()
-                // {
-                //     continue;
-                // }
             }
         }
 
@@ -66,9 +59,9 @@ int main(int argc, char *argv[])
     if (res == 3)
         cout << "\nDraw!";
     else if (res == 2)
-        cout << "\nPlayer 2 Wins!";
+        cout << "\nO Wins!";
     else
-        cout << "\nPlayer 1 Wins!";
+        cout << "\nX Wins!";
 
     return 0;
 }
