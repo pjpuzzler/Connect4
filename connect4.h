@@ -3,6 +3,8 @@
 
 using namespace std;
 
+extern int maxDepth;
+
 vector<int> getMoves(array<array<int, 7>, 6> board);
 
 int negamax(array<array<int, 7>, 6> board, int depth, int alpha, int beta, int coef);

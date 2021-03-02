@@ -5,10 +5,9 @@
 int main(int argc, char *argv[])
 {
     bool humanPlayerOne = true;
-    bool humanPlayerTwo = true;
+    bool humanPlayerTwo = false;
     array<array<int, 7>, 6> board = {};
     int player = 1;
-    int depth = 5;
     int col;
 
     do
@@ -16,16 +15,12 @@ int main(int argc, char *argv[])
         if (player == 1 && !humanPlayerOne || player == 2 && !humanPlayerTwo)
         {
             // AI turn
-            int coef;
-
             displayBoard(board);
 
             if (player == 1)
-                coef = 1;
+                board = pushMove(board, negamax(board, maxDepth, -100, 100, 1), player);
             else
-                coef = -1;
-
-            board = pushMove(board, negamax(board, depth, -100, 100, coef), player);
+                board = pushMove(board, negamax(board, maxDepth, -100, 100, -1), player);
         }
         else
         {

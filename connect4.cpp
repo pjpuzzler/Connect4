@@ -1,8 +1,12 @@
+#include <vector>
 #include <algorithm>
+#include <iostream>
 
 #include "connect4.h"
 
 using namespace std;
+
+int maxDepth = 5;
 
 vector<int> getMoves(array<array<int, 7>, 6> board)
 {
@@ -32,16 +36,15 @@ int negamax(array<array<int, 7>, 6> board, int depth, int alpha, int beta, int c
         return coef * evaluate(board);
 
     int maxEval = -100;
-    int player;
     int bestMove;
     for (int move : getMoves(board))
     {
-        if (coef == 1)
-            player = 1;
-        else
-            player = 2;
+        int eval;
 
-        int eval = -negamax(pushMove(board, move, player), depth - 1, -beta, -alpha, -coef);
+        if (coef == 1)
+            eval = -negamax(pushMove(board, move, 1), depth - 1, -beta, -alpha, -coef);
+        else
+            eval = -negamax(pushMove(board, move, 2), depth - 1, -beta, -alpha, -coef);
 
         if (eval > maxEval)
         {
@@ -54,7 +57,7 @@ int negamax(array<array<int, 7>, 6> board, int depth, int alpha, int beta, int c
             break;
     }
 
-    if (depth == 0)
+    if (depth == maxDepth)
         return bestMove;
     else
         return maxEval;
@@ -84,7 +87,7 @@ int gameOver(array<array<int, 7>, 6> board)
                 count = 0;
             else if (board[i][j] != player)
             {
-                count = 0;
+                count = 1;
                 player = board[i][j];
             }
             else
@@ -107,7 +110,7 @@ int gameOver(array<array<int, 7>, 6> board)
                 count = 0;
             else if (board[j][i] != player)
             {
-                count = 0;
+                count = 1;
                 player = board[j][i];
             }
             else
@@ -131,7 +134,7 @@ int gameOver(array<array<int, 7>, 6> board)
                 count = 0;
             else if (board[i + j][j] != player)
             {
-                count = 0;
+                count = 1;
                 player = board[i + j][j];
             }
             else
@@ -156,7 +159,7 @@ int gameOver(array<array<int, 7>, 6> board)
                 count = 0;
             else if (board[j][i + j] != player)
             {
-                count = 0;
+                count = 1;
                 player = board[j][i + j];
             }
             else
@@ -182,7 +185,7 @@ int gameOver(array<array<int, 7>, 6> board)
                 count = 0;
             else if (board[i - j][j] != player)
             {
-                count = 0;
+                count = 1;
                 player = board[i - j][j];
             }
             else
@@ -197,18 +200,18 @@ int gameOver(array<array<int, 7>, 6> board)
 
     for (i = 1; i < 4; i++)
     {
-        j = 6;
+        j = 5;
         count = 0;
         player = 0;
 
-        while (i + 6 - j < 7)
+        while (i + 5 - j < 7)
         {
-            if (board[j][i + 6 - j] == 0)
+            if (board[j][i + 5 - j] == 0)
                 count = 0;
-            else if (board[j][i + 6 - j] != player)
+            else if (board[j][i + 5 - j] != player)
             {
-                count = 0;
-                player = board[j][i + 6 - j];
+                count = 1;
+                player = board[j][i + 5 - j];
             }
             else
                 count++;
@@ -246,7 +249,7 @@ void displayBoard(array<array<int, 7>, 6> board)
 {
     system("CLS");
 
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < 6; i++)
     {
         for (int j = 0; j < 7; j++)
         {
@@ -264,7 +267,7 @@ bool validMove(array<array<int, 7>, 6> board, int col)
 
 array<array<int, 7>, 6> pushMove(array<array<int, 7>, 6> board, int col, int player)
 {
-    int row = 6;
+    int row = 5;
 
     while (row > 0 && board[row][col] != 0)
         row--;
