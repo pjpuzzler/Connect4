@@ -1,7 +1,6 @@
-#include <iostream>
 #include <algorithm>
-#include <vector>
-#include <array>
+
+#include "connect4.h"
 
 using namespace std;
 
@@ -25,24 +24,6 @@ vector<int> getMoves(array<array<int, 7>, 6> board)
         moves.push_back(6);
 
     return moves;
-}
-
-int evaluate(array<array<int, 7>, 6> board)
-{
-    int res = gameOver(board);
-
-    if (res == 1)
-        return 99;
-    if (res == 2)
-        return -99;
-    if (res == 3)
-        return 0;
-
-    int eval = 0;
-    int i = 0;
-    int player = 1;
-
-    // check partial connects
 }
 
 int negamax(array<array<int, 7>, 6> board, int depth, int alpha, int beta, int coef)
@@ -242,6 +223,25 @@ int gameOver(array<array<int, 7>, 6> board)
     return 0;
 }
 
+int evaluate(array<array<int, 7>, 6> board)
+{
+    int res = gameOver(board);
+
+    if (res == 1)
+        return 99;
+    if (res == 2)
+        return -99;
+    if (res == 3)
+        return 0;
+
+    int eval = 0;
+    int i = 0;
+    int player = 1;
+
+    return 0;
+    // TODO: check partial connects
+}
+
 void displayBoard(array<array<int, 7>, 6> board)
 {
     system("CLS");
@@ -272,80 +272,4 @@ array<array<int, 7>, 6> pushMove(array<array<int, 7>, 6> board, int col, int pla
     board[row][col] = player;
 
     return board;
-}
-
-int main(int argc, char *argv[])
-{
-    bool humanPlayerOne = true;
-    bool humanPlayerTwo = true;
-    array<array<int, 7>, 6> board = {};
-    int player = 1;
-    int depth = 5;
-    int col;
-
-    do
-    {
-        if (player == 1 && !humanPlayerOne || player == 2 && !humanPlayerTwo)
-        {
-            // AI turn
-            int coef;
-
-            displayBoard(board);
-
-            if (player == 1)
-                coef = 1;
-            else
-                coef = -1;
-
-            board = pushMove(board, negamax(board, depth, -100, 100, coef), player);
-        }
-        else
-        {
-            // player turn
-            while (true)
-            {
-                // try
-                // {
-                displayBoard(board);
-
-                if (player == 1)
-                    cout << "\n(Player 1) Column: ";
-                else
-                    cout << "\n(Player 2) Column: ";
-
-                cin >> col;
-                col--;
-
-                if (validMove(board, col))
-                {
-                    board = pushMove(board, col, player);
-                    break;
-                }
-                // }
-                // catch ()
-                // {
-                //     continue;
-                // }
-            }
-        }
-
-        // change turn
-        if (player == 1)
-            player = 2;
-        else
-            player = 1;
-    } while (gameOver(board) == 0);
-
-    int res = gameOver(board);
-
-    displayBoard(board);
-
-    if (res == 3)
-        cout << "\nDraw!";
-    else if (res == 2)
-        cout << "\nPlayer 2 Wins!";
-    else
-        cout << "\nPlayer 1 Wins!";
-
-    return 0;
 }
