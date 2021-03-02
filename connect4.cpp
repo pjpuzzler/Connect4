@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int maxDepth = 5;
+int maxDepth = 10;
 
 vector<int> getMoves(array<array<int, 7>, 6> board)
 {
@@ -622,7 +622,7 @@ void displayBoard(array<array<int, 7>, 6> board)
         cout << "|\n";
     }
 
-    cout << "------------------------------------------";
+    cout << "-------------------------------------------";
 }
 
 bool validMove(array<array<int, 7>, 6> board, int col)
