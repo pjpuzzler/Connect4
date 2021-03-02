@@ -1,5 +1,6 @@
 #include <vector>
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 #include "connect4.h"
@@ -35,7 +36,7 @@ int negamax(array<array<int, 7>, 6> board, int depth, int alpha, int beta, int c
     if (depth == 0 || gameOver(board) > 0)
         return coef * evaluate(board);
 
-    int maxEval = -100;
+    int maxEval = -1000;
     int bestMove;
     for (int move : getMoves(board))
     {
@@ -72,8 +73,6 @@ int gameOver(array<array<int, 7>, 6> board)
     int j;
     int count;
     int player;
-    int diagRow;
-    int diagCol;
 
     // horizontal check
     for (i; i < 6; i++)
@@ -84,7 +83,10 @@ int gameOver(array<array<int, 7>, 6> board)
         for (j = 0; j < 7; j++)
         {
             if (board[i][j] == 0)
+            {
                 count = 0;
+                player = 0;
+            }
             else if (board[i][j] != player)
             {
                 count = 1;
@@ -107,7 +109,10 @@ int gameOver(array<array<int, 7>, 6> board)
         for (j = 5; j >= 0; j--)
         {
             if (board[j][i] == 0)
+            {
                 count = 0;
+                player = 0;
+            }
             else if (board[j][i] != player)
             {
                 count = 1;
@@ -131,7 +136,10 @@ int gameOver(array<array<int, 7>, 6> board)
         while (i + j < 6)
         {
             if (board[i + j][j] == 0)
+            {
                 count = 0;
+                player = 0;
+            }
             else if (board[i + j][j] != player)
             {
                 count = 1;
@@ -156,7 +164,10 @@ int gameOver(array<array<int, 7>, 6> board)
         while (i + j < 7)
         {
             if (board[j][i + j] == 0)
+            {
                 count = 0;
+                player = 0;
+            }
             else if (board[j][i + j] != player)
             {
                 count = 1;
@@ -182,7 +193,10 @@ int gameOver(array<array<int, 7>, 6> board)
         while (i - j >= 0)
         {
             if (board[i - j][j] == 0)
+            {
                 count = 0;
+                player = 0;
+            }
             else if (board[i - j][j] != player)
             {
                 count = 1;
@@ -207,7 +221,10 @@ int gameOver(array<array<int, 7>, 6> board)
         while (i + 5 - j < 7)
         {
             if (board[j][i + 5 - j] == 0)
+            {
                 count = 0;
+                player = 0;
+            }
             else if (board[j][i + 5 - j] != player)
             {
                 count = 1;
@@ -231,18 +248,352 @@ int evaluate(array<array<int, 7>, 6> board)
     int res = gameOver(board);
 
     if (res == 1)
-        return 99;
+        return 999;
     if (res == 2)
-        return -99;
+        return -999;
     if (res == 3)
         return 0;
 
     int eval = 0;
     int i = 0;
-    int player = 1;
+    int j;
+    int count;
+    int player;
+    bool slotBefore;
 
-    return 0;
-    // TODO: check partial connects
+    // horizontal check
+    for (i; i < 6; i++)
+    {
+        count = 0;
+        player = 0;
+        slotBefore = false;
+
+        for (j = 0; j < 7; j++)
+        {
+            if (board[i][j] == 0)
+            {
+                if (slotBefore)
+                {
+                    if (player == 1)
+                        eval += pow(count, 3) * 2;
+                    else
+                        eval -= pow(count, 3) * 2;
+                }
+                else
+                {
+                    if (player == 1)
+                        eval += pow(count, 3);
+                    else
+                        eval -= pow(count, 3);
+                }
+                count = 0;
+                player = 0;
+                slotBefore = true;
+            }
+            else if (board[i][j] != player)
+            {
+                if (slotBefore)
+                {
+                    if (player == 1)
+                        eval += pow(count, 3);
+                    else
+                        eval -= pow(count, 3);
+                }
+                count = 1;
+                if (player != 0)
+                    slotBefore = false;
+                player = board[i][j];
+            }
+            else
+                count++;
+        }
+
+        if (slotBefore)
+        {
+            if (player == 1)
+                eval += pow(count, 3);
+            else
+                eval -= pow(count, 3);
+        }
+    }
+
+    // vertical check
+    for (i = 0; i < 7; i++)
+    {
+        count = 0;
+        player = 0;
+
+        for (j = 5; j >= 0; j--)
+        {
+            if (board[j][i] == 0)
+            {
+                if (player == 1)
+                    eval += pow(count, 3);
+                else
+                    eval -= pow(count, 3);
+                count = 0;
+                player = 0;
+            }
+            else if (board[j][i] != player)
+            {
+                count = 1;
+                player = board[j][i];
+            }
+            else
+                count++;
+
+            if (count == 4)
+                return player;
+        }
+    }
+
+    // top-left to bottom-right diagonal check
+    for (i = 0; i < 3; i++)
+    {
+        j = 0;
+        count = 0;
+        player = 0;
+        slotBefore = false;
+
+        while (i + j < 6)
+        {
+            if (board[i + j][j] == 0)
+            {
+                if (slotBefore)
+                {
+                    if (player == 1)
+                        eval += pow(count, 3) * 2;
+                    else
+                        eval -= pow(count, 3) * 2;
+                }
+                else
+                {
+                    if (player == 1)
+                        eval += pow(count, 3);
+                    else
+                        eval -= pow(count, 3);
+                }
+                count = 0;
+                player = 0;
+                slotBefore = true;
+            }
+            else if (board[i + j][j] != player)
+            {
+                if (slotBefore)
+                {
+                    if (player == 1)
+                        eval += pow(count, 3);
+                    else
+                        eval -= pow(count, 3);
+                }
+                count = 1;
+                if (player != 0)
+                    slotBefore = false;
+                player = board[i + j][j];
+            }
+            else
+                count++;
+
+            if (count == 4)
+                return player;
+
+            j++;
+        }
+
+        if (slotBefore)
+        {
+            if (player == 1)
+                eval += pow(count, 3);
+            else
+                eval -= pow(count, 3);
+        }
+    }
+
+    for (i = 1; i < 4; i++)
+    {
+        j = 0;
+        count = 0;
+        player = 0;
+        slotBefore = false;
+
+        while (i + j < 7)
+        {
+            if (board[j][i + j] == 0)
+            {
+                if (slotBefore)
+                {
+                    if (player == 1)
+                        eval += pow(count, 3) * 2;
+                    else
+                        eval -= pow(count, 3) * 2;
+                }
+                else
+                {
+                    if (player == 1)
+                        eval += pow(count, 3);
+                    else
+                        eval -= pow(count, 3);
+                }
+                count = 0;
+                player = 0;
+                slotBefore = true;
+            }
+            else if (board[j][i + j] != player)
+            {
+                if (slotBefore)
+                {
+                    if (player == 1)
+                        eval += pow(count, 3);
+                    else
+                        eval -= pow(count, 3);
+                }
+                count = 1;
+                if (player != 0)
+                    slotBefore = false;
+                player = board[j][i + j];
+            }
+            else
+                count++;
+
+            if (count == 4)
+                return player;
+
+            j++;
+        }
+
+        if (slotBefore)
+        {
+            if (player == 1)
+                eval += pow(count, 3);
+            else
+                eval -= pow(count, 3);
+        }
+    }
+
+    // bottom-left to top-right diagonal check
+    for (i = 3; i < 6; i++)
+    {
+        j = 0;
+        count = 0;
+        player = 0;
+        slotBefore = false;
+
+        while (i - j >= 0)
+        {
+            if (board[i - j][j] == 0)
+            {
+                if (slotBefore)
+                {
+                    if (player == 1)
+                        eval += pow(count, 3) * 2;
+                    else
+                        eval -= pow(count, 3) * 2;
+                }
+                else
+                {
+                    if (player == 1)
+                        eval += pow(count, 3);
+                    else
+                        eval -= pow(count, 3);
+                }
+                count = 0;
+                player = 0;
+                slotBefore = true;
+            }
+            else if (board[i - j][j] != player)
+            {
+                if (slotBefore)
+                {
+                    if (player == 1)
+                        eval += pow(count, 3);
+                    else
+                        eval -= pow(count, 3);
+                }
+                count = 1;
+                if (player != 0)
+                    slotBefore = false;
+                player = board[i - j][j];
+            }
+            else
+                count++;
+
+            if (count == 4)
+                return player;
+
+            j++;
+        }
+
+        if (slotBefore)
+        {
+            if (player == 1)
+                eval += pow(count, 3);
+            else
+                eval -= pow(count, 3);
+        }
+    }
+
+    for (i = 1; i < 4; i++)
+    {
+        j = 5;
+        count = 0;
+        player = 0;
+        slotBefore = false;
+
+        while (i + 5 - j < 7)
+        {
+            if (board[j][i + 5 - j] == 0)
+            {
+                if (slotBefore)
+                {
+                    if (player == 1)
+                        eval += pow(count, 3) * 2;
+                    else
+                        eval -= pow(count, 3) * 2;
+                }
+                else
+                {
+                    if (player == 1)
+                        eval += pow(count, 3);
+                    else
+                        eval -= pow(count, 3);
+                }
+                count = 0;
+                player = 0;
+                slotBefore = true;
+            }
+            else if (board[j][i + 5 - j] != player)
+            {
+                if (slotBefore)
+                {
+                    if (player == 1)
+                        eval += pow(count, 3);
+                    else
+                        eval -= pow(count, 3);
+                }
+                count = 1;
+                if (player != 0)
+                    slotBefore = false;
+                player = board[j][i + 5 - j];
+            }
+            else
+                count++;
+
+            if (count == 4)
+                return player;
+
+            j--;
+        }
+
+        if (slotBefore)
+        {
+            if (player == 1)
+                eval += pow(count, 3);
+            else
+                eval -= pow(count, 3);
+        }
+    }
+
+    return eval;
 }
 
 void displayBoard(array<array<int, 7>, 6> board)
